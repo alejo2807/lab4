@@ -7,15 +7,16 @@
 
 class Tablero : public ITablero {
 private:
-    std::vector<std::vector<Ficha*>> tablero;
-    
-    // Add limpiarTablero declaration
-    void limpiarTablero();
+	std::vector<std::vector<Ficha*>> tablero;
+	
+	// Add limpiarTablero declaration
+	void limpiarTablero();
 public:
-    void cargarDesdeArchivo(const std::string& archivo) override;
-    Ficha* getFicha(int fila, int columna) const override;
-    int getSize()const override;
-    ~Tablero();
+	int getColumnCount() const;  // Se agrega para solucionar el error de que el usuario perdia siempre
+	void cargarDesdeArchivo(const std::string& archivo) override;
+	Ficha* getFicha(int fila, int columna) const override;
+	int getSize()const override;
+	~Tablero();
 };
 
 #endif
