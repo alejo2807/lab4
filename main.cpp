@@ -15,55 +15,59 @@
 
 int main() {
 
-				// Crear un tablero
-				Tablero tablero;
-				// Cargar el tablero desde un archivo
-				tablero.cargarDesdeArchivo("dataTablero.txt");
-				 // Crear el avatar en una posición inicial
-				/*
-				Avatar avatar; // Posición inicial en (2,2)
-				avatar.setPosicionFila(2);
-				avatar.setPosicionColumna(2);
-				 */
-				
-				AvatarCPU maquina;
-				maquina.setPosicionColumna(2);
-				maquina.setPosicionFila(2);
+	// Crear un tablero
+	Tablero tablero;
+	// Cargar el tablero desde un archivo
+	tablero.cargarDesdeArchivo("dataTablero.txt");
+	
+	 // Crear el avatar en una posición inicial
+	/*
+	Avatar avatar; // Posición inicial en (2,2)
+	avatar.setPosicionFila(2);
+	avatar.setPosicionColumna(2);
+	 
+	// Crear el avatar CPU en una posición inicial
+	AvatarCPU maquina;
+	ava.setPosicionColumna(2);
+	ava.setPosicionFila(2);
+	*/
+	
 
-				
-		/*
-				
-				AvatarInnovador avatarInnovador; // Posición inicial en (2,2)
-				avatarInnovador.setPosicionFila(2);
-				avatarInnovador.setPosicionColumna(2);
-		*/		
-				
-				
-				
-				// Crear la lógica de movimiento
-				LogicaDeMovimiento logicaDeMovimiento;
-				//Crear un juego
-				Juego juego(&tablero, &maquina, &logicaDeMovimiento, true);
-				juego.iniciar();
-				VistaConsola vista(&tablero, &maquina);
-				do{
-				vista.mostrarJuego();
-				vista.mostrarMensaje("Digite su movimiento:");
-				juego.play(vista.getEntradaConsola());
-				
-				}while(juego.getWin()==false and juego.getEstado()==true);
+	
+		
+	
+	AvatarInnovador avatarInnovador; // Posición inicial en (2,2)
+	avatarInnovador.setPosicionFila(2);
+	avatarInnovador.setPosicionColumna(2);
+			
+	
+	
+	
+	// Crear la lógica de movimiento
+	LogicaDeMovimiento logicaDeMovimiento;
+	
+	
+	Juego juego(&tablero, &avatarInnovador, &logicaDeMovimiento, true);
+	juego.iniciar();
+	VistaConsola vista(&tablero, &avatarInnovador);
+	do{
+	vista.mostrarJuego();
+	vista.mostrarMensaje("Digite su movimiento:");
+	juego.play(vista.getEntradaConsola());
+	
+	}while(juego.getWin()==false and juego.getEstado()==true);
 
-				if (juego.getWin()==true) vista.mostrarMensaje("Ganaste el juego, el total de puntos es:"+std::to_string(juego.getPuntaje()));
-				else 
-				{
-					// IMMEDIATE LOSE CHECK
-    				if (!juego.getEstado()) {
-						vista.limpiarPantalla();
-						vista.mostrarMensaje("¡PERDISTE! Caíste en un abismo.");
-						return 0;  // Exit game immediately
-    			}
-					//vista.limpiarPantalla();vista.mostrarMensaje("Perdiste el juego, el total de puntos es:0");
-				}
+	if (juego.getWin()==true) vista.mostrarMensaje("Ganaste el juego, el total de puntos es:"+std::to_string(juego.getPuntaje()));
+	else 
+	{
+		//chequeo de perdida 
+		if (!juego.getEstado()) {
+vista.limpiarPantalla();
+vista.mostrarMensaje("¡PERDISTE! Caíste en un abismo.");
+return 0;  
+	}
+		//vista.limpiarPantalla();vista.mostrarMensaje("Perdiste el juego, el total de puntos es:0");
+	}
 
 	//  std::cout << "\033[1;31m"; // Cambiar a rojo brillante
 	//  std::cout << "\033[0m"; // Restablecer al color por defecto
