@@ -1,76 +1,117 @@
 #include <iostream>
+#include <cctype>
+#include <thread>   // Para std::this_thread
+#include <chrono>   // Para std::chrono
+#include <limits>   // Para std::numeric_limits
 #include "Tablero.h"
-#include "Camino.h"
-#include "Abismo.h"
-#include "Salida.h"
 #include "Juego.h"
-#include "Tablero.h"
 #include "LogicaDeMovimiento.h"
 #include "VistaConsola.h"
 #include "AvatarInnovador.h"
-#include "Avatar.h"
-#include <iostream>
-#include <cstdlib> // Para system
 #include "AvatarCPU.h"
 
+using namespace std;
+
 int main() {
-
-	// Crear un tablero
+	// Inicializar componentes comunes
 	Tablero tablero;
-	// Cargar el tablero desde un archivo
 	tablero.cargarDesdeArchivo("dataTablero.txt");
-	
-	 // Crear el avatar en una posición inicial
-	/*
-	Avatar avatar; // Posición inicial en (2,2)
-	avatar.setPosicionFila(2);
-	avatar.setPosicionColumna(2);
-	 
-	// Crear el avatar CPU en una posición inicial
-	AvatarCPU maquina;
-	ava.setPosicionColumna(2);
-	ava.setPosicionFila(2);
-	*/
-	
-
-	
-		
-	
-	AvatarInnovador avatarInnovador; // Posición inicial en (2,2)
-	avatarInnovador.setPosicionFila(2);
-	avatarInnovador.setPosicionColumna(2);
-			
-	
-	
-	
-	// Crear la lógica de movimiento
 	LogicaDeMovimiento logicaDeMovimiento;
+	VistaConsola vista(&tablero, nullptr); // Inicialmente sin avatar
 	
-	
-	Juego juego(&tablero, &avatarInnovador, &logicaDeMovimiento, true);
-	juego.iniciar();
-	VistaConsola vista(&tablero, &avatarInnovador);
-	do{
-	vista.mostrarJuego();
-	vista.mostrarMensaje("Digite su movimiento:");
-	juego.play(vista.getEntradaConsola());
-	
-	}while(juego.getWin()==false and juego.getEstado()==true);
+	// Menú de selección
+	char eleccion;
+	do {
+		cout << "╔══════════════════════════════╗\n";
+		cout << "║        JUEGO DE AVATAR       ║\n";
+		cout << "╠══════════════════════════════╣\n";
+		cout << "║ 1. Jugar yo mismo            ║\n";
+		cout << "║ 2. Ver jugar a la CPU        ║\n";
+		cout << "║ 3. Salir                     ║\n";
+		cout << "╚══════════════════════════════╝\n";
+		cout << "Seleccione una opción: ";
+		cin >> eleccion;
+		
+		// Limpiar buffer de entrada
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		
+		IPersonaje* avatar = nullptr;
+		bool modoCPU = false;
+		
+		switch(eleccion) {
+			case '1': // Modo jugador humano
+				avatar = new AvatarInnovador();
+				avatar->setPosicionFila(2);
+				avatar->setPosicionColumna(2);
+				vista.setAvatar(avatar);
+				modoCPU = false;
+				break;
+				
+			case '2': // Modo CPU
+				avatar = new AvatarCPU();
+				avatar->setPosicionFila(2);
+				avatar->setPosicionColumna(2);
+				vista.setAvatar(avatar);
+				modoCPU = true;
+				break;
+				
+			case '3': // Salir
+				cout << "¡Hasta pronto!\n";
+				return 0;
+				
+			default:
+				cout << "Opción inválida. Intente nuevamente.\n";
+				continue;
+		}
+		
+		// Configurar e iniciar juego
+		Juego juego(&tablero, avatar, &logicaDeMovimiento, true);
+		juego.iniciar();
+		
+		if (modoCPU) {
+			cout << "Iniciando simulación de CPU...\n";
+			cout << "Presione Ctrl+C para detener en cualquier momento.\n";
+		}
 
-	if (juego.getWin()==true) vista.mostrarMensaje("Ganaste el juego, el total de puntos es:"+std::to_string(juego.getPuntaje()));
-	else 
-	{
-		//chequeo de perdida 
-		if (!juego.getEstado()) {
-vista.limpiarPantalla();
-vista.mostrarMensaje("¡PERDISTE! Caíste en un abismo.");
-return 0;  
-	}
-		//vista.limpiarPantalla();vista.mostrarMensaje("Perdiste el juego, el total de puntos es:0");
-	}
+		// Bucle principal del juego
+		do {
+			vista.mostrarJuego();
+			
+			if (modoCPU) {
+				// Espera automática para modo CPU
+				vista.mostrarMensaje("CPU jugando...");
+				this_thread::sleep_for(chrono::milliseconds(500)); // Pausa entre movimientos
+				juego.play(' '); // Carácter dummy, la lógica de CPU lo ignora
+			} else {
+				vista.mostrarMensaje("Digite su movimiento:");
+				juego.play(vista.getEntradaConsola());
+			}
+			
+			// Verificar estado del juego
+			if (!juego.getEstado()) {
+				vista.limpiarPantalla();
+				vista.mostrarJuego();
+				vista.mostrarMensaje("¡PERDISTE! Caíste en un abismo.");
+				break;
+			}
+			
+		} while(!juego.getWin());
 
-	//  std::cout << "\033[1;31m"; // Cambiar a rojo brillante
-	//  std::cout << "\033[0m"; // Restablecer al color por defecto
-	 
-		return 0;
+		// Resultado final
+		if (juego.getWin()) {
+			vista.limpiarPantalla();
+			vista.mostrarJuego();
+			vista.mostrarMensaje("¡GANASTE! Puntaje final: " + 
+								to_string(juego.getPuntaje()));
+		}
+
+		// Limpiar para nueva partida
+		delete avatar;
+		cout << "\nPresione Enter para continuar...";
+		cin.ignore();
+		vista.limpiarPantalla();
+		
+	} while(true);
+
+	return 0;
 }
