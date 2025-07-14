@@ -11,6 +11,7 @@
 #include "Avatar.h"
 #include <iostream>
 #include <cstdlib> // Para system
+#include "AvatarCPU.h"
 
 int main() {
 
@@ -24,28 +25,32 @@ int main() {
 				avatar.setPosicionFila(2);
 				avatar.setPosicionColumna(2);
 				 */
-
+				
+				AvatarCPU maquina;
+				maquina.setPosicionColumna(2);
+				maquina.setPosicionFila(2);
 
 				
-				
+		/*
 				
 				AvatarInnovador avatarInnovador; // Posición inicial en (2,2)
 				avatarInnovador.setPosicionFila(2);
 				avatarInnovador.setPosicionColumna(2);
-				
+		*/		
 				
 				
 				
 				// Crear la lógica de movimiento
 				LogicaDeMovimiento logicaDeMovimiento;
 				//Crear un juego
-				Juego juego(&tablero, &avatarInnovador, &logicaDeMovimiento, true);
+				Juego juego(&tablero, &maquina, &logicaDeMovimiento, true);
 				juego.iniciar();
-				VistaConsola vista(&tablero, &avatarInnovador);
+				VistaConsola vista(&tablero, &maquina);
 				do{
 				vista.mostrarJuego();
 				vista.mostrarMensaje("Digite su movimiento:");
 				juego.play(vista.getEntradaConsola());
+				
 				}while(juego.getWin()==false and juego.getEstado()==true);
 
 				if (juego.getWin()==true) vista.mostrarMensaje("Ganaste el juego, el total de puntos es:"+std::to_string(juego.getPuntaje()));

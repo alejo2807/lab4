@@ -8,7 +8,9 @@
 #include <ctime>   // Para time()
 #include <termios.h>
 #include <unistd.h> // Para STDIN_FILENO
-
+#include "AvatarCPU.h"
+#include "AvatarInnovador.h"
+using namespace std;
 VistaConsola::VistaConsola(ITablero* tablero, IPersonaje* avatar):tablero(tablero), avatar(avatar){}
 
 void VistaConsola::mostrarTablero() {
@@ -52,7 +54,7 @@ void VistaConsola::mostrarJuego() {
             }
             
             switch(ficha->getTipo()) {
-                case '1': std::cout << (rand() % 2 ? "🟩 " : "🟨 "); break;
+                case '1': std::cout << (rand() % 2 ? "🟨 " : "🟨 "); break;
                 case '0': std::cout << "🟦 "; break;
                 case 'S': std::cout << "💰 "; break;
                 default:  std::cout << "  ";
@@ -81,6 +83,14 @@ char VistaConsola::getEntradaConsola() {
 	newt.c_lflag &= ~(ICANON | ECHO);
 	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
+
+	bool esAvatarCPU;
+	if (dynamic_cast<AvatarCPU*>(avatar)) {
+    esAvatarCPU= true;
+} else {
+    esAvatarCPU= false;
+}
+	if(esAvatarCPU == false){
 	do {
 	std::cout << "Ingrese una opción [aA-Izquierda] [wW-Arriba] [sS-Abajo] [dD-Derecha]\n [qQ-Diagonal Arriba Izq] [eE-Diagonal Arriba Der] [zZ-Diagonal Abajo Izq] [cC-Diagonal Abajo Der]: ";
 	entrada=getchar();
@@ -96,7 +106,13 @@ char VistaConsola::getEntradaConsola() {
 		} else {
 			std::cout << "Entrada inválida. Por favor, introduce wW, aA, sS, dD, qQ, eE, zZ o cC.\n";
 		}
-	} while (!entradaValida);
+	} while (!entradaValida);}
+	else{
+
+		cout << "Ingrese una letra cualquiera "<<endl;
+		entrada=getchar();
+	}
+	
 
 	return entrada;
 }
